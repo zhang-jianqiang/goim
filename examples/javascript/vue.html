@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <title>GoIM测试</title>
+    <script src="js/jquery.min.js"></script>
+    <!--    <script src="js/jquery.slim.min.js"></script>-->
+    <script src="js/bootstrap.bundle.min.js"></script>
+    <script src="js/vue3.js"></script>
+    <style>
+        [v-cloak] {
+            display: none;
+        }
+
+        .f16 {
+            font-size: 18px;
+            flex: 0 0 100px;
+            padding-right: 0;
+            font-weight: bold;
+        }
+
+        .lh48 {
+            line-height: 48px;
+        }
+
+        .bt {
+            border-top: 1px solid #c2bebe;
+            padding-top: 10px;
+        }
+        .cbg {
+            background-color: lightblue;
+        }
+        .cspan {
+            font-weight: bold;
+            display: inline-block;
+            border-right: 1px solid rgb(175, 171, 171);
+            margin-right: 10px;
+        }
+    </style>
+</head>
+
+<body>
+<div id="app" v-cloak>
+    <div class="container" style="border: 1px solid rgb(192, 186, 186);">
+        <div class="row">
+            <div class="col">
+                <div class="form-group">
+                    <h3>goim在线测试工具</h3>
+                </div>
+            </div>
+        </div>
+        <div class="row bt">
+            <div class="col-2 form-group f16 lh48">token</div>
+            <div class="col form-group">
+                <input class="form-control form-control-lg" v-model.trim="msg" type="text">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-2 form-group f16 lh48">连接地址</div>
+            <div class="col-6 form-group">
+                <input class="form-control form-control-lg" v-model.trim="addr" type="text">
+            </div>
+            <div class="col-1 form-group lh48">
+                <button type="button" class="btn btn-primary form-control" @click="connect">连接</button>
+            </div>
+            <div class="col-1 form-group lh48">
+                <button type="button" class="btn btn-danger form-control" @click="close">断开</button>
+            </div>
+            <div class="col-1 form-group lh48">
+                <button type="button" class="btn btn-danger form-control" @click="clearMsg">清除</button>
+            </div>
+        </div>
+        <div class="row bt">
+            <div class="col form-group">
+                <h4>发消息</h4>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 form-group lh48 cbg"><span class="cspan">curl:&emsp;</span>curl -d 'mid message' 'http://api.goim.io:3111/goim/push/mids?operation=1000&mids=123'</div>
+            <div class="col-2 form-group f16 lh48">mids:</div>
+            <div class="col-2 form-group">
+                <input class="form-control form-control-lg" v-model.trim="mids" type="text">
+            </div>
+            <div class="col-2 form-group f16 lh48">operation:</div>
+            <div class="col-2 form-group">
+                <input class="form-control form-control-lg" v-model.trim="operation" type="text">
+            </div>
+            <div class="col-2 form-group f16 lh48">msg:</div>
+            <div class="col-3 form-group">
+                <input class="form-control form-control-lg" v-model.trim="msg1" type="text">
+            </div>
+            <div class="col-1 form-group lh48">
+                <button type="button" class="btn btn-primary form-control" @click="pushMids">发送</button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 form-group lh48 cbg"><span class="cspan">curl:&emsp;</span>curl -d 'room message' 'http://api.goim.io:3111/goim/push/room?operation=1000&type=live&room=1000'</div>
+            <div class="col-2 form-group f16 lh48">operation:</div>
+            <div class="col-2 form-group">
+                <input class="form-control form-control-lg" v-model.trim="roomOpration" type="text">
+            </div>
+            <div class="col-2 form-group f16 lh48">room:</div>
+            <div class="col-2 form-group">
+                <input class="form-control form-control-lg" v-model.trim="room" type="text">
+            </div>
+            <div class="col-2 form-group f16 lh48">msg:</div>
+            <div class="col-3 form-group">
+                <input class="form-control form-control-lg" v-model.trim="roomMsg" type="text">
+            </div>
+            <div class="col-1 form-group lh48">
+                <button type="button" class="btn btn-primary form-control" @click="pushRoom">发送</button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 form-group lh48 cbg"><span class="cspan">curl:&emsp;</span>curl -d 'broadcast message' 'http://api.goim.io:3111/goim/push/all?operation=1000'</div>
+            <div class="col-2 form-group f16 lh48">operation:</div>
+            <div class="col-2 form-group">
+                <input class="form-control form-control-lg" v-model.trim="broadOpration" type="text">
+            </div>
+            <div class="col-2 form-group f16 lh48">msg:</div>
+            <div class="col-5 form-group">
+                <input class="form-control form-control-lg" v-model.trim="broadMsg" type="text">
+            </div>
+            <div class="col-2 form-group lh48">
+                <button type="button" class="btn btn-primary form-control" @click="pushBroad">发送广播</button>
+            </div>
+        </div>
+        <div class="row bt">
+            <div class="col form-group">
+                <h4>接收的的信息如下</h4>
+            </div>
+        </div>
+        <div class="pre-scrollable" style="height: 450px;">
+            <div v-for="(item, index) in msgList" :key="index"
+                 style="height: 40px;line-height: 40px;font-size: 16px;background: linen;border-bottom: 1px solid lightblue;">
+                <strong>{{msgList.length - index}}. </strong>{{item.msg}}
+            </div>
+        </div>
+    </div>
+
+</div>
+<script>
+    const rawHeaderLen = 16; // msg前面的字节数
+    const packetOffset = 0;
+    const headerOffset = 4;
+    const verOffset = 6;
+    const opOffset = 8;
+    const seqOffset = 12;
+    let heartbeatInterval = null;
+    const midUrl = 'http://127.0.0.1:3111/goim/push/mids';
+    const roomUrl = 'http://127.0.0.1:3111/goim/push/room';
+    const broadUrl = 'http://127.0.0.1:3111/goim/push/all';
+    const appData = {
+        data() {
+            return {
+                ws: null,
+                addr: "ws://127.0.0.1:3102/sub",
+                msg: '{"mid":123, "room_id":"live://1000", "platform":"web", "accepts":[1000]}',
+                msgList: [],
+                mids: '123',
+                operation: 1000,
+                msg1: 'mids消息',
+                roomOpration: 1000,
+                roomType: 1,
+                room: '1000',
+                roomMsg: '群消息',
+                broadOpration: 1000,
+                broadMsg: '广播消息'
+            }
+        },
+        methods: {
+            pushMids: function () {
+                let url = midUrl + '?operation=' + this.operation + '&mids=' + this.mids;
+                const settings = {
+                    "url": url,
+                    "method": "POST",
+                    "timeout": 0,
+                    "headers": {
+                        "Content-Type": "text/plain"
+                    },
+                    "data": this.msg1,
+                };
+                let _this = this;
+                $.ajax(settings).done(function (res) {
+                    _this.msgList.unshift({msg: _this.get() + ' 调用api单发消息成功，mids=' + _this.mids + ', msg=' + _this.msg1})
+                });
+            },
+            pushRoom: function () {
+                const settings = {
+                    // "url": "http://127.0.0.1:3111/goim/push/room?operation=1000&type=live&room=1000",
+                    "url": roomUrl + '?operation=' + this.roomOpration + '&type=live&room=' + this.room,
+                    "method": "POST",
+                    "timeout": 0,
+                    "headers": {
+                        "Content-Type": "text/plain"
+                    },
+                    "data": this.roomMsg,
+                };
+                let _this = this;
+                $.ajax(settings).done(function (response) {
+                    _this.msgList.push(_this.getTime() + " 调用api群发消息成功，operation=" + _this.roomOpration + ', type=live, room=' + _this.room);
+                });
+            },
+            pushBroad: function () {
+
+            },
+            connect: function () {
+                if (this.addr === '') {
+                    alert('ws地址不能为空');
+                    return;
+                }
+                this.msgList.unshift({msg: this.getTime() + ' 开始连接'});
+                this.ws = new WebSocket(this.addr);
+                this.ws.binaryType = 'arraybuffer';
+                this.ws.onopen = this.open;
+                this.ws.onmessage = this.receive;
+                this.ws.close = this.close;
+            },
+            auth: function () {
+                this.msgList.unshift({msg: this.getTime() + ' 连接成功，开始进行权限校验'});
+                let token = new TextEncoder().encode(this.msg);
+                let buf = new ArrayBuffer(rawHeaderLen + token.length);
+                let view = new DataView(buf, 0);
+                view.setInt32(packetOffset, rawHeaderLen + token.length); // 第一个参数，数据的总字节数
+                view.setInt16(headerOffset, rawHeaderLen); // msg前面数据的字节数
+                view.setInt16(verOffset, 1); // ver参数
+                view.setInt32(opOffset, 7); // op参数 7 验证权限 回复8
+                view.setInt32(seqOffset, 1); // seq 参数
+                let bodyBuf = new Uint8Array(buf, rawHeaderLen, token.length) // msg参数
+                bodyBuf.set(token);
+                this.ws.send(buf);
+            },
+            open: function () {
+                this.auth();
+            },
+            receive: function (evt) {
+                let data = evt.data;
+                let dataView = new DataView(data, 0);
+                let packetLen = dataView.getInt32(packetOffset);
+                let headerLen = dataView.getInt16(headerOffset);
+                let ver = dataView.getInt16(verOffset);
+                let op = dataView.getInt32(opOffset);
+                let seq = dataView.getInt32(seqOffset);
+                let msgBody;
+                switch (op) {
+                    case 8:
+                        this.msgList.unshift({msg: this.getTime() + ' 权限校验通过，开启心跳监测'})
+                        // 权限验证通过，开启一个定时器发送心跳
+                        this.heartbeat();
+                        heartbeatInterval = setInterval(this.heartbeat, 30 * 1000);
+                        break;
+                    case 3:
+                        // receive a heartbeat from server
+                        this.msgList.unshift({'msg': this.getTime() + ' 收到心跳回复 ver=' + ver + ', op=' + op + ', seq=' + seq + ' '});
+                        break;
+                    case 9:
+                        // batch message
+                        for (let offset = rawHeaderLen; offset < data.byteLength; offset += packetLen) {
+                            // parse
+                            packetLen = dataView.getInt32(offset);
+                            headerLen = dataView.getInt16(offset + headerOffset);
+                            ver = dataView.getInt16(offset + verOffset);
+                            op = dataView.getInt32(offset + opOffset);
+                            seq = dataView.getInt32(offset + seqOffset);
+                            msgBody = new TextDecoder().decode(data.slice(offset + headerLen, offset + packetLen));
+                            // callback
+                            this.msgList.unshift({'msg': this.getTime() + " 收到批量消息 ver=" + ver + " op=" + op + " seq=" + seq + " message=" + msgBody});
+                        }
+                        break;
+                    default:
+                        msgBody = new TextDecoder().decode(data.slice(headerLen, packetLen));
+                        this.msgList.unshift({'msg': this.getTime() + " 收到单个消息 ver=" + ver + " op=" + op + " seq=" + seq + " message=" + msgBody});
+                        break
+                }
+            },
+            close: function () {
+                if (heartbeatInterval) {
+                    clearInterval()
+                }
+                // 重试一次
+                let _this = this;
+                setTimeout(function () {
+                    _this.connect();
+                }, 15000)
+                this.msgList.push({msg: this.getTime() + ' 连接断开'})
+            },
+            heartbeat: function () {
+                const headerBuf = new ArrayBuffer(rawHeaderLen);
+                const headerView = new DataView(headerBuf, 0);
+                headerView.setInt32(packetOffset, rawHeaderLen);
+                headerView.setInt16(headerOffset, rawHeaderLen);
+                headerView.setInt16(verOffset, 1);
+                headerView.setInt32(opOffset, 2); // 心跳类型
+                headerView.setInt32(seqOffset, 1);
+                this.ws.send(headerBuf);
+                this.msgList.unshift({msg: this.getTime() + ' 发送心跳 ver=1, op=2, seq=1 '})
+            },
+            clearMsg: function () {
+                this.msgList = [];
+            },
+            getTime: function () {
+                let date = new Date();
+                return date.getFullYear() + '-' + date.getMonth() + '-' + date.getDate() + ' ' + date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds() + '.' + date.getMilliseconds();
+            }
+        }
+    }
+    // 创建一个Vue 应用
+    const app = Vue.createApp(appData).mount('#app');
+</script>
+</body>
+
+</html>
