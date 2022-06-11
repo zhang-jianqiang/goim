@@ -27,9 +27,8 @@ goim v2.0
 
 ## 安装
 ### 一、安装依赖
-```sh
-$ yum -y install java-1.7.0-openjdk
-```
+
+安装`jdk`
 
 ### 二、安装Kafka消息队列服务
 
@@ -37,60 +36,26 @@ kafka在官网已经描述的非常详细，在这里就不过多说明，安装
 
 ### 三、搭建golang环境
 1.下载源码(根据自己的系统下载对应的[安装包](http://golang.org/dl/))
-```sh
-$ cd /data/programfiles
-$ wget -c --no-check-certificate https://storage.googleapis.com/golang/go1.5.2.linux-amd64.tar.gz
-$ tar -xvf go1.5.2.linux-amd64.tar.gz -C /usr/local
-```
+
 2.配置GO环境变量
-(这里我加在/etc/profile.d/golang.sh)
-```sh
-$ vi /etc/profile.d/golang.sh
-# 将以下环境变量添加到profile最后面
-export GOROOT=/usr/local/go
-export PATH=$PATH:$GOROOT/bin
-export GOPATH=/data/apps/go
-$ source /etc/profile
-```
 
 ### 四、部署goim
-1.下载goim及依赖包
-```sh
-$ yum install hg
-$ go get -u github.com/Terry-Mao/goim
-$ mv $GOPATH/src/github.com/Terry-Mao/goim $GOPATH/src/goim
-$ cd $GOPATH/src/goim
-$ go get ./...
-```
 
-2.安装router、logic、comet、job模块(配置文件请依据实际机器环境配置)
+安装router、logic、comet、job模块(配置文件请依据实际机器环境配置)
 ```sh
-$ cd $GOPATH/src/goim/router
-$ go install
-$ cp router-example.conf $GOPATH/bin/router.conf
-$ cp router-log.xml $GOPATH/bin/
-$ cd ../logic/
-$ go install
-$ cp logic-example.conf $GOPATH/bin/logic.conf
-$ cp logic-log.xml $GOPATH/bin/
-$ cd ../comet/
-$ go install
-$ cp comet-example.conf $GOPATH/bin/comet.conf
-$ cp comet-log.xml $GOPATH/bin/
-$ cd ../logic/job/
-$ go install
-$ cp job-example.conf $GOPATH/bin/job.conf
-$ cp job-log.xml $GOPATH/bin/
+$ git clone https://github.com/Terry-Mao/goim.git
+$ cd goim
+$ make build
 ```
 到此所有的环境都搭建完成！
 
 ### 五、启动goim
 ```sh
-$ cd /$GOPATH/bin
-$ nohup $GOPATH/bin/router -c $GOPATH/bin/router.conf 2>&1 > /data/logs/goim/panic-router.log &
-$ nohup $GOPATH/bin/logic -c $GOPATH/bin/logic.conf 2>&1 > /data/logs/goim/panic-logic.log &
-$ nohup $GOPATH/bin/comet -c $GOPATH/bin/comet.conf 2>&1 > /data/logs/goim/panic-comet.log &
-$ nohup $GOPATH/bin/job -c $GOPATH/bin/job.conf 2>&1 > /data/logs/goim/panic-job.log &
+$ make run
+或
+$ nohup target/logic -conf=target/logic.toml -region=sh -zone=sh001 -deploy.env=dev -weight=10 2>&1 > target/logic.log &
+$ nohup target/comet -conf=target/comet.toml -region=sh -zone=sh001 -deploy.env=dev -weight=10 -addrs=127.0.0.1 -debug=true 2>&1 > target/comet.log &
+$ nohup target/job -conf=target/job.toml -region=sh -zone=sh001 -deploy.env=dev 2>&1 > target/job.log &
 ```
 如果启动失败，默认配置可通过查看panic-xxx.log日志文件来排查各个模块问题.
 
