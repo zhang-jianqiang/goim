@@ -2,6 +2,7 @@ package grpc
 
 import (
 	"context"
+	"github.com/Terry-Mao/goim/api/biz"
 	"net"
 	"time"
 
@@ -27,6 +28,7 @@ func New(c *conf.RPCServer, l *logic.Logic) *grpc.Server {
 	})
 	srv := grpc.NewServer(keepParams)
 	pb.RegisterLogicServer(srv, &server{l})
+	biz.RegisterBizServer(srv, &bizServer{srv: l})
 	lis, err := net.Listen(c.Network, c.Addr)
 	if err != nil {
 		panic(err)
