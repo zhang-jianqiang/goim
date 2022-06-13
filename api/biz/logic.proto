@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+option go_package = "./;biz";
+
+message PushMidsReq {
+  int32 op = 1;
+  repeated int64 mids = 2;
+  bytes msg = 3;
+}
+
+message PushMidsRes {
+  int32 code = 1;
+  string data = 2;
+}
+
+service Biz {
+  rpc pushMids(PushMidsReq) returns (PushMidsRes) {}
+}

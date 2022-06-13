@@ -163,11 +163,10 @@
                 mids: '123',
                 operation: 1000,
                 msg1: 'mids消息',
-                roomOpration: 1000,
-                roomType: 1,
+                roomOperation: 1000,
                 room: '1000',
                 roomMsg: '群消息',
-                broadOpration: 1000,
+                broadOperation: 1000,
                 broadMsg: '广播消息'
             }
         },
@@ -191,7 +190,7 @@
             pushRoom: function () {
                 const settings = {
                     // "url": "http://127.0.0.1:3111/goim/push/room?operation=1000&type=live&room=1000",
-                    "url": roomUrl + '?operation=' + this.roomOpration + '&type=live&room=' + this.room,
+                    "url": roomUrl + '?operation=' + this.roomOperation + '&type=live&room=' + this.room,
                     "method": "POST",
                     "timeout": 0,
                     "headers": {
@@ -201,11 +200,24 @@
                 };
                 let _this = this;
                 $.ajax(settings).done(function (response) {
-                    _this.msgList.push(_this.getTime() + " 调用api群发消息成功，operation=" + _this.roomOpration + ', type=live, room=' + _this.room);
+                    _this.msgList.push(_this.getTime() + " 调用api群发消息成功，operation=" + _this.roomOperation + ', type=live, room=' + _this.room);
                 });
             },
             pushBroad: function () {
-
+                const settings = {
+                    // "url": "http://127.0.0.1:3111/goim/push/all?operation=1000",
+                    "url": broadUrl + "?operation=" + this.broadOperation,
+                    "method": "POST",
+                    "timeout": 0,
+                    "headers": {
+                        "Content-Type": "text/plain"
+                    },
+                    "data": this.broadMsg,
+                };
+                let _this = this;
+                $.ajax(settings).done(function (response) {
+                    _this.msgList.push(_this.getTime() + " 调用api广播消息成功，operation=" + _this.broadOperation);
+                });
             },
             connect: function () {
                 if (this.addr === '') {
